@@ -10,9 +10,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Flutter First App'),
@@ -28,20 +29,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _CardsUsers extends State<MyHomePage> {
-  var text = "None";
   List<dynamic> usersList = [];
 
   @override
   Widget build(BuildContext context) {
     Future<List<dynamic>> future = getData();
-    future.then((data) {
-      debugPrint("Данные получены");
-      usersList = data;
-      //setState(() {});
-    });
+    future.then((data) => usersList = data );
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
         title: const Text("List of users"),
       ),
       body: ListView(
@@ -71,21 +68,49 @@ class UserProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
         title: Text(data["username"]),
       ),
       body: Center(
-        child: Column(
-          children: [
-            Text("Name: ${data["name"]}"),
-            Text("Email: ${data["email"]}"),
-            Text("Phone: ${data["phone"]}"),
-            Text("WebSite: ${data["website"]}"),
-            Text("Work company: ${data["company"]["name"]}"),
-            Text("BS: ${data["company"]["bs"]}"),
-            Text("Catch phrase: ${data["company"]["catchPhrase"]}", style: const TextStyle(fontStyle: FontStyle.italic)),
-            Text("Phone: ${data["phone"]}"),
-            Text("Address: ${data["address"]["city"]} ${data["address"]["suite"]} ${data["address"]["street"]}"),
-          ],
+        child: Container(
+          width: 600,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("${data["name"]}", style: const TextStyle(fontSize: 35),),
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Email: ${data["email"]}"),
+                        Text("Phone: ${data["phone"]}"),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("WebSite: ${data["website"]}"),
+                        Text("Address: ${data["address"]["city"]} ${data["address"]["suite"]} ${data["address"]["street"]}"),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
+                child: Text("Company", style: TextStyle(fontSize: 30),),
+              ),
+              Text("Name: ${data["company"]["name"]}", style: const TextStyle(fontSize: 20,)),
+              Text("BS: ${data["company"]["bs"]}", style: const TextStyle(fontSize: 20,)),
+              Text("${data["company"]["catchPhrase"]}", style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic)),
+            ],
+          ),
         ),
       ),
     );

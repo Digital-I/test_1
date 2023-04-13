@@ -28,34 +28,48 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _CardsUsers();
 }
 
+
 class _CardsUsers extends State<MyHomePage> {
-  List<dynamic> usersList = [];
+  late Future<List<dynamic>> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = getData();
+  }
 
   @override
   Widget build(BuildContext context) {
-    Future<List<dynamic>> future = getData();
-    future.then((data) => usersList = data );
-
-    return Scaffold(
+     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
         title: const Text("List of users"),
       ),
-      body: ListView(
-        children: [
-          for (var user in usersList)
-            ListTile(
-              title: Text(user["username"]),
-              subtitle: Text(user["name"]),
-              onTap: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserProfile(data: user))
-                );
-              },
-            )
-        ],
-      ),
+      body: FutureBuilder(
+        future: _future,
+        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+          if (snapshot.connectionState != ConnectionState.done){
+            return const Center(child: CircularProgressIndicator());
+          }
+          return ListView(
+            children: [
+              for (var user in [])
+                ListTile(
+                  title: Text(user["username"]),
+                  subtitle: Text(user["name"]),
+                  onTap: (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => UserProfile(data: user))
+                    );
+                  },
+                )
+            ],
+          );
+      })
+
+
+
     );
   }
 }

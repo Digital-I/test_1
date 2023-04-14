@@ -1,141 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
+import 'package:test_1/router/app_router.dart';
+
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late AppRouter _router;
+  @override
+  void initState() {
+    _router = AppRouter();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: _router.config(),
       debugShowCheckedModeBanner: false,
       title: 'Flutter App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyanAccent),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter First App'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-  @override
-  State<MyHomePage> createState() => _CardsUsers();
-}
-
-
-class _CardsUsers extends State<MyHomePage> {
-  late Future<List<dynamic>> _future;
-
-  @override
-  void initState() {
-    super.initState();
-    _future = getData();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        title: const Text("List of users"),
-      ),
-      body: FutureBuilder(
-        future: _future,
-        builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-          if (snapshot.connectionState != ConnectionState.done){
-            return const Center(child: CircularProgressIndicator());
-          }
-          return ListView(
-            children: [
-              for (var user in [])
-                ListTile(
-                  title: Text(user["username"]),
-                  subtitle: Text(user["name"]),
-                  onTap: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => UserProfile(data: user))
-                    );
-                  },
-                )
-            ],
-          );
-      })
-
-
-
-    );
-  }
-}
-
-
-class UserProfile extends StatelessWidget {
-  const UserProfile({super.key, required this.data});
-  final Map<String, dynamic> data;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        title: Text(data["username"]),
-      ),
-      body: Center(
-        child: Container(
-          width: 600,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("${data["name"]}", style: const TextStyle(fontSize: 35),),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Email: ${data["email"]}"),
-                        Text("Phone: ${data["phone"]}"),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("WebSite: ${data["website"]}"),
-                        Text("Address: ${data["address"]["city"]} ${data["address"]["suite"]} ${data["address"]["street"]}"),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
-                child: Text("Company", style: TextStyle(fontSize: 30),),
-              ),
-              Text("Name: ${data["company"]["name"]}", style: const TextStyle(fontSize: 20,)),
-              Text("BS: ${data["company"]["bs"]}", style: const TextStyle(fontSize: 20,)),
-              Text("${data["company"]["catchPhrase"]}", style: const TextStyle(fontSize: 20, fontStyle: FontStyle.italic)),
-            ],
-          ),
-        ),
+        colorScheme: const ColorScheme.light(),
+        useMaterial3: false,
       ),
     );
-  }
-}
-
-Future<List<dynamic>> getData() async {
-  var response = await http.get(Uri.https('jsonplaceholder.typicode.com', '/users'));
-  if (response.statusCode == 200) {
-    return convert.jsonDecode(response.body) as List<dynamic>;
-  } else {
-    throw Exception("No data");
   }
 }

@@ -20,6 +20,7 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
+
   late Future<User> _future;
   Future<User> getData() async {
     var response = await http
@@ -31,19 +32,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  List<Posts> _posts = [];
-  Future<List> getPostsOfUser() async {
+  Future<List<Posts>> getPostsOfUser() async {
     var response = await http
         .get(Uri.https('jsonplaceholder.typicode.com', '/posts/', {'userId': widget.id}));
     if (response.statusCode == 200) {
-      return _posts = (jsonDecode(response.body) as List<dynamic>)
+      return (jsonDecode(response.body) as List<dynamic>)
         .map((e) => Posts.fromJson(e))
         .toList();
     } else {
       throw Exception(response.statusCode.toString());
     }
   }
-
 
   @override
   void initState() {
@@ -126,20 +125,25 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     child: FutureBuilder(
                       future: getPostsOfUser(),
                       builder: (context, snap) {
+                        if (snap.connectionState != ConnectionState.done){
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final posts = snap.data!;
                         return ListView.builder(
-                            itemCount: _posts.length,
-                            itemBuilder: (context, index) {
-                              final post = _posts[index];
+                            itemCount: posts.length,
+                            itemBuilder: (context, index){
+                              final post = posts[index];
                               return ListTile(
-                                title: Text(post.title ?? 'Fuck'),
-                                subtitle: Text(post.body ?? 'Fuck 2'),
-                                onTap: () {},
+                                title: Text(post.title ?? ''),
+                                subtitle: Text(post.body ?? ''),
+                                onTap: (){},
                               );
                             }
                         );
                       }
                     )
                   )
+
                 ],
               ),
             ),

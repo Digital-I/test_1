@@ -31,16 +31,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  late Future<List<Posts>> _posts;
-  Future<List<Posts>> getPostsOfUser() async {
+  List<Posts> _posts = [];
+  Future<List> getPostsOfUser() async {
     var response = await http
-        .get(Uri.https('jsonplaceholder.typicode.com', '/posts?userId=${widget.id}'));
+        .get(Uri.https('jsonplaceholder.typicode.com', '/posts/', {'userId': widget.id}));
     if (response.statusCode == 200) {
-      return (jsonDecode(response.body) as List<dynamic>)
+      return _posts = (jsonDecode(response.body) as List<dynamic>)
         .map((e) => Posts.fromJson(e))
         .toList();
     } else {
-      throw Exception('No data');
+      throw Exception(response.statusCode.toString());
     }
   }
 
@@ -48,7 +48,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   void initState() {
     _future = getData();
-    _posts = getPostsOfUser();
     super.initState();
   }
 
@@ -60,7 +59,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
         if (snap.connectionState != ConnectionState.done) {
           return const Center(child: CircularProgressIndicator());
         }
-        final posts = _posts as List<Posts>;
         final data = snap.data!;
         return Scaffold(
           appBar: AppBar(
@@ -124,17 +122,24 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         style: TextStyle(fontSize: 30),
                       ),
                   ),
-                  ListView.builder(
-                    itemCount: posts.length,
-                    itemBuilder: (context, index){
-                      final post = posts[index];
-                      return ListTile(
-                        title: Text(post.title ?? 'Fuck'),
-                        subtitle: Text(post.body ?? 'Fuck 2'),
-                        onTap: (){},
-                      );
-                    }
-                  ),
+                  Expanded(
+                    child: FutureBuilder(
+                      future: getPostsOfUser(),
+                      builder: (context, snap) {
+                        return ListView.builder(
+                            itemCount: _posts.length,
+                            itemBuilder: (context, index) {
+                              final post = _posts[index];
+                              return ListTile(
+                                title: Text(post.title ?? 'Fuck'),
+                                subtitle: Text(post.body ?? 'Fuck 2'),
+                                onTap: () {},
+                              );
+                            }
+                        );
+                      }
+                    )
+                  )
                 ],
               ),
             ),

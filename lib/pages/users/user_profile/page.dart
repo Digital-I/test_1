@@ -3,9 +3,11 @@ import 'dart:convert';
 import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:auto_route/auto_route.dart';
+import 'package:test_1/router/app_router.gr.dart';
 
 import '../../../models/user.dart';
-import '../../../models/posts.dart';
+import '../../../models/post.dart';
 
 @RoutePage()
 class UserProfilePage extends StatefulWidget {
@@ -32,12 +34,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  Future<List<Posts>> getPostsOfUser() async {
+  Future<List<Post>> getPostsOfUser() async {
     var response = await http
         .get(Uri.https('jsonplaceholder.typicode.com', '/posts/', {'userId': widget.id}));
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List<dynamic>)
-        .map((e) => Posts.fromJson(e))
+        .map((e) => Post.fromJson(e))
         .toList();
     } else {
       throw Exception(response.statusCode.toString());
@@ -135,8 +137,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               final post = posts[index];
                               return ListTile(
                                 title: Text(post.title ?? ''),
-                                subtitle: Text(post.body ?? ''),
-                                onTap: (){},
+                                subtitle: Text(post.body ?? '',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                                onTap: (){
+                                  AutoRouter.of(context)
+                                      .navigate(UserPostRoute(id: post.id.toString()));},
                               );
                             }
                         );

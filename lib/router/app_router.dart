@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:test_1/pages/users/user_profile/page_post.dart';
 import 'package:test_1/router/app_router.gr.dart';
 
 @AutoRouterConfig(
@@ -16,5 +17,6 @@ class AppRouter extends $AppRouter {
   List<AutoRoute> get routes => [
         AutoRoute(path: '/', page: AllUsersRoute.page),
         AutoRoute(path: '/:id', page: UserProfileRoute.page),
+        AutoRoute(path: '/post:id', page: UserPostRoute.page),
       ];
 }

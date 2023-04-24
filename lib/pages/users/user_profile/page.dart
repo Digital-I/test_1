@@ -34,18 +34,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  Future<List<Post>> getPostsOfUser() async {
-    var response = await http
-        .get(Uri.https('jsonplaceholder.typicode.com', '/posts/', {'userId': widget.id}));
-    if (response.statusCode == 200) {
-      return (jsonDecode(response.body) as List<dynamic>)
-        .map((e) => Post.fromJson(e))
-        .toList();
-    } else {
-      throw Exception(response.statusCode.toString());
-    }
-  }
-
   @override
   void initState() {
     _future = getData();
@@ -123,40 +111,63 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         style: TextStyle(fontSize: 30),
                       ),
                   ),
-                  Expanded(
-                    child: FutureBuilder(
-                      future: getPostsOfUser(),
-                      builder: (context, snap) {
-                        if (snap.connectionState != ConnectionState.done){
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        final posts = snap.data!;
-                        return ListView.builder(
-                            itemCount: posts.length,
-                            itemBuilder: (context, index){
-                              final post = posts[index];
-                              return ListTile(
-                                title: Text(post.title ?? ''),
-                                subtitle: Text(post.body ?? '',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                                onTap: (){
-                                  AutoRouter.of(context)
-                                      .navigate(UserPostRoute(id: post.id.toString()));},
-                              );
-                            }
-                        );
-                      }
-                    )
-                  )
-
+                  ListPosts(id: widget.id),
                 ],
               ),
             ),
           ),
         );
-      },
+    },);
+  }
+}
+
+class ListPosts extends StatelessWidget {
+  final String id;
+  const ListPosts({
+    super.key,
+    required String this.id
+  });
+
+  Future<List<Post>> getPostsOfUser() async {
+    var response = await http
+        .get(Uri.https('jsonplaceholder.typicode.com', '/posts/', {'userId': id}));
+    if (response.statusCode == 200) {
+      return (jsonDecode(response.body) as List<dynamic>)
+          .map((e) => Post.fromJson(e))
+          .toList();
+    } else {
+      throw Exception(response.statusCode.toString());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+        child: FutureBuilder(
+          future: getPostsOfUser(),
+          builder: (context, snap) {
+            if (snap.connectionState != ConnectionState.done || snap.data == null || snap.data!.isEmpty){
+              return const Center(child: CircularProgressIndicator());
+            }
+            final posts = snap.data!;
+            return ListView.builder(
+                itemCount: posts.length,
+                itemBuilder: (context, index){
+                  final post = posts[index];
+                  return ListTile(
+                    title: Text(post.title ?? ''),
+                    subtitle: Text(post.body ?? '',
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    onTap: (){
+                      AutoRouter.of(context)
+                          .navigate(UserPostRoute(id: post.id.toString()));
+                    },
+                  );
+            },);
+        },),
     );
   }
 }
+

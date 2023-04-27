@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:test_1/bloc/mod_theme_bloc.dart';
 import 'package:test_1/router/app_router.dart';
-import 'package:test_1/states/mod_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,18 +25,18 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ModTheme(),
-      child: BlocBuilder<ModTheme, ColorScheme>(
+      create: (context) => ModThemeBloc(),
+      child: BlocBuilder<ModThemeBloc, ModThemeState>(
         builder: (context, state){
           return MaterialApp.router(
             routerConfig: _router.config(),
             debugShowCheckedModeBanner: false,
             title: 'Flutter App',
             theme: ThemeData(
-              colorScheme: state,
+              colorScheme: , 
               useMaterial3: false,
             ),
-        );}
+        );},
       ),
     );
   }

@@ -17,11 +17,14 @@ class UserPostPage extends StatefulWidget {
 }
 
 class _UserPostPageState extends State<UserPostPage> {
-
   late Future<Map<String, dynamic>> _post;
   Future<Map<String, dynamic>> getPostOfUser() async {
-    var response = await http
-        .get(Uri.https('jsonplaceholder.typicode.com', '/posts/${widget.id}', ));
+    final response = await http.get(
+      Uri.https(
+        'jsonplaceholder.typicode.com',
+        '/posts/${widget.id}',
+      ),
+    );
     if (response.statusCode == 200) {
       //result.map((e) => e as Map<String, dynamic>).toList();
       return jsonDecode(response.body) as Map<String, dynamic>;
@@ -45,8 +48,10 @@ class _UserPostPageState extends State<UserPostPage> {
       body: Center(
         child: FutureBuilder(
           future: _post,
-          builder: (context, snap){
-            if (snap.connectionState != ConnectionState.done || snap.data == null || snap.data!.isEmpty) {
+          builder: (context, snap) {
+            if (snap.connectionState != ConnectionState.done ||
+                snap.data == null ||
+                snap.data!.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
             final post = snap.data!;
@@ -54,13 +59,22 @@ class _UserPostPageState extends State<UserPostPage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(15),
-                  child: Text(post['title'] ?? '', style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),),
+                  child: Text(
+                    post['title'] ?? '',
+                    style: const TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-                Text(post['body'] ?? '', style: const TextStyle(fontSize: 20),),
+                Text(
+                  post['body'] ?? '',
+                  style: const TextStyle(fontSize: 20),
+                ),
               ],
             );
           },
-        )
+        ),
       ),
     );
   }

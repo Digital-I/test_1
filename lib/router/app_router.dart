@@ -1,5 +1,4 @@
 import 'package:auto_route/auto_route.dart';
-import 'package:test_1/pages/users/user_profile/page_post.dart';
 import 'package:test_1/router/app_router.gr.dart';
 
 @AutoRouterConfig(

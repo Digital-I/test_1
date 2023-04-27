@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:auto_route/annotations.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:auto_route/auto_route.dart';
@@ -22,7 +21,6 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-
   late Future<User> _future;
   Future<User> getData() async {
     var response = await http
@@ -78,7 +76,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('WebSite: ${data.website}'),
-                          Text('Address: ${data.address.city} ${data.address.suite} ${data.address.street}'),
+                          Text(
+                            'Address: ${data.address.city} ${data.address.suite} ${data.address.street}',
+                          ),
                         ],
                       )
                     ],
@@ -93,23 +93,31 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       style: TextStyle(fontSize: 30),
                     ),
                   ),
-                  Text('Name: ${data.company.name}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                      )),
-                  Text('BS: ${data.company.bs}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                      )),
-                  Text(data.company.catchPhrase,
-                      style: const TextStyle(
-                          fontSize: 20, fontStyle: FontStyle.italic)),
+                  Text(
+                    'Name: ${data.company.name}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  Text(
+                    'BS: ${data.company.bs}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  Text(
+                    data.company.catchPhrase,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                   const Padding(
-                      padding: EdgeInsets.fromLTRB(0, 30, 0, 10),
-                      child: Text(
-                        'Posts',
-                        style: TextStyle(fontSize: 30),
-                      ),
+                    padding: EdgeInsets.fromLTRB(0, 30, 0, 10),
+                    child: Text(
+                      'Posts',
+                      style: TextStyle(fontSize: 30),
+                    ),
                   ),
                   ListPosts(id: widget.id),
                 ],
@@ -117,20 +125,32 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ),
           ),
         );
-    },);
+      },
+    );
   }
 }
 
-class ListPosts extends StatelessWidget {
+class ListPosts extends StatefulWidget {
   final String id;
   const ListPosts({
     super.key,
-    required String this.id
+    required this.id,
   });
 
+  @override
+  State<ListPosts> createState() => _ListPosts();
+}
+
+class _ListPosts extends State<ListPosts> {
+  late Future<List<Post>> _posts;
   Future<List<Post>> getPostsOfUser() async {
-    var response = await http
-        .get(Uri.https('jsonplaceholder.typicode.com', '/posts/', {'userId': id}));
+    final response = await http.get(
+      Uri.https(
+        'jsonplaceholder.typicode.com',
+        '/posts/',
+        {'userId': widget.id},
+      ),
+    );
     if (response.statusCode == 200) {
       return (jsonDecode(response.body) as List<dynamic>)
           .map((e) => Post.fromJson(e))
@@ -141,33 +161,43 @@ class ListPosts extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    _posts = getPostsOfUser();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: FutureBuilder(
-          future: getPostsOfUser(),
-          builder: (context, snap) {
-            if (snap.connectionState != ConnectionState.done || snap.data == null || snap.data!.isEmpty){
-              return const Center(child: CircularProgressIndicator());
-            }
-            final posts = snap.data!;
-            return ListView.builder(
-                itemCount: posts.length,
-                itemBuilder: (context, index){
-                  final post = posts[index];
-                  return ListTile(
-                    title: Text(post.title ?? ''),
-                    subtitle: Text(post.body ?? '',
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                    ),
-                    onTap: (){
-                      AutoRouter.of(context)
-                          .navigate(UserPostRoute(id: post.id.toString()));
-                    },
-                  );
-            },);
-        },),
+      child: FutureBuilder(
+        future: _posts,
+        builder: (context, snap) {
+          if (snap.connectionState != ConnectionState.done ||
+              snap.data == null ||
+              snap.data!.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final posts = snap.data!;
+          return ListView.builder(
+            itemCount: posts.length,
+            itemBuilder: (context, index) {
+              final post = posts[index];
+              return ListTile(
+                title: Text(post.title ?? ''),
+                subtitle: Text(
+                  post.body ?? '',
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                onTap: () {
+                  AutoRouter.of(context)
+                      .navigate(UserPostRoute(id: post.id.toString()));
+                },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
-

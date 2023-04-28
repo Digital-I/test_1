@@ -49,8 +49,11 @@ class _AllUsersPage extends State<AllUsersPage> {
               return IconButton(
                 icon: const Icon(Icons.sunny),
                 onPressed: () {
-                  BlocProvider.of<ModThemeBloc>(context)
-                      .add(LightModThemeEvent());
+                  BlocProvider.of<ModThemeBloc>(context).add(
+                    state.colorScheme == const ColorScheme.dark()
+                        ? LightModThemeEvent()
+                        : DarkModThemeEvent(),
+                  );
                 },
               );
             },

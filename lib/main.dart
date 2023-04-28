@@ -27,16 +27,17 @@ class _MyAppState extends State<MyApp> {
     return BlocProvider(
       create: (context) => ModThemeBloc(),
       child: BlocBuilder<ModThemeBloc, ModThemeState>(
-        builder: (context, state){
+        builder: (context, state) {
           return MaterialApp.router(
             routerConfig: _router.config(),
             debugShowCheckedModeBanner: false,
             title: 'Flutter App',
             theme: ThemeData(
-              colorScheme: , 
+              colorScheme: state.colorScheme,
               useMaterial3: false,
             ),
-        );},
+          );
+        },
       ),
     );
   }
